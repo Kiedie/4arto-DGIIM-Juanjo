@@ -1,2 +1,2 @@
-# 4arto-DGIIM-Juanjo
-Material de la carrera
+# Asignatura Informática Gráfica
+Material del curso
