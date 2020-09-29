@@ -18,7 +18,8 @@
         - Cámara Virtual: posición, ángulo de visión y orientación  
         - Viewport: Resolución y posición de la imagen en la ventana
 
-# Algoritmos: Rasterización y Ray-tracing  
+
+### Algoritmos: Rasterización y Ray-tracing  
 
 - Rasterización:
     - Primitiva: elementos más pequeños que pueden ver visualizados. Punto, segmento, etc.
@@ -59,6 +60,123 @@ For each pixel q de la imagen a producir
         - Transformación y proyección de primitivas.
             -Proyección: perspectiva o paralela
 
-## Sección 3
+### Las APIs de rasterización 
+La escritura en el Framebuffer es lenta y se realiza pixel a pixel, ya que cada operación de acceso al buffer es lenta. Usando una API conseguimos separar la implementación del hardware, permitiendo portabilidad y acceso simultáneio.  
+Hoy en día se usan GPU, Unidad de Procesamiento Gráfico con chips con unidades de operaciones en coma flotante, unidades de control, etc y que pueden trabajar en paralelo. Con capaces de implementar el cauce de rasterización con buena eficiencia.
+
+APIs de rastericación:  
+- OpenGL
+    - OpenGL ES
+    - WebGS
+- DirectX
+- Metal
+- DirectX12
+- Vulkan
+
+El cauce gráfico tiene las siguiente etápas:  
+- Procesado de vértices:
+  - Transformación
+  - Teselación y nivel de detalle
+- Post-proceso de vértices y montaje de primitivas
+- Rasterización
+- Sombreado
+## Sección 3: La librería OpenGL.- Visualización
+- OpenGL: para visualizar 2D y 3D
+  - GLFW: para gestión de ventanas y eventos de entrada  
+
+### Programación y eventosd en GLFW  
+- Eventos:
+  - Teclado
+  - Ratón
+  - Cambio de tamaño 
+- Funciones Gestoras de Eventos, FGE: son invocadas uando ocurre algún eventgo de algún tipo 
+
+Estructura de un programa:
+- Variables, ED, variables globales
+- Código de las funcioens gestoras de evento
+- Código de inicialización
+  - Creación y configuración de las ventanas donde se visualizan las primitivas
+  - Establecimiento de las funciones del programa que actuarán como gestoras de eventos
+  - Configuración inicial de OpenGL
+- Función de viusalización de un frame o cuadro
+- Bucle principal
+
+### Tipos de primitivas
+- Primitiva: punto, segmento o polígono que generalmente son triángulos. 
+- Con una lista de n coordenadas se puede codificar:
+  - puntos aislados
+  - segmentos de recta
+  - triangulos
+  - cuadriláteros
+  - polígono
+  - tira de triángulos
+  - abanico de triángulos
+  - tira de cuadriláteros
+- Los polígonos se pueden visualizar como:
+  - Puntos
+  - Líneas
+  - Relleno  
+- Se debe cumlir:
+  - Vertices en el mismo plano
+  - No se deben intersecar las aristas
+  - Deben ser convexos
+- Problema de vértices replicados: se repiten coordenadas
+  - Solución: Secuencias indexadas
+    - Vn --> Secuencia con los vértices
+    - Im --> secuencia de índices (enteros) que dicta la unión de puntos de Vn  
+
+__IMPORTANTE__: no confundir la constante __GL_Line__ con __GL_Lines__
+### Atributos de vértices   
+- **Coordenadas de su posición**
+- **color**: RGB entre 0 y 1
+- **Normal**: vector qued etermina la orientación (para iluminacion)  
+- **Coordenadas de textura**
+- **Valores:**
+  - Todo vertice --> (posicion,color,normal,coord_textura)  
+
+### Modos de envío  
+Si queremos visualizar la secuencia de vertices o atributos:  
+- Modo inmediato
+  - Una llamada por vértice y atributo:
+    - Lento
+    - Cordenadas y atributos vértice a vértice
+  - Una llamada para varios vérties con todos sus atributos
+  - No almacena coordenadas, por tanto, para visualizar más de una vez es necesario enviar las mismas coordenadas cad vez  
+- Modo diferido: 
+  - Una única llamda, previamente trasladar las cosas de la RAM a la GPU
+  - Reservar memoria en la GPU  
+
+### Almacenamiento de vértices y atributos  
+- Array de estructuras (AOS):
+  - Array o vector  
+  - Cada entrada tiene:
+    - Coordenadas de sus vertices
+    - Atributos
+- Estructura de Arrays (SOA):
+  - Estructura con punteros a arrays 
+  - Los arrays contienen:
+    - uno para coordenadas
+    - otros para los atributos  
+    - Echarle un ojo a lo de los descriptores de la tabla
+------------------------------------------------- 
+- Vertex Array Objects:   
+      - Estructura de datos    
+      - Para modo diferido:  
+        - Crea tantos VAOs como sean necesarios  
+      - Para modo inmediato:  
+        - guarda un único VAO  
+  
+### Envío de vértices y atributos  
+
+
+
 ## Sección 4
-## Sección 5
+## Sección 5  
+
+# Tema2:  
+
+### Mayas indexadas  
+Una ED que contiene información sobre una maya de triángulos en 3d. 
+- contiene:
+  - Tabla de vertices
+  - Tabla de triáungos
