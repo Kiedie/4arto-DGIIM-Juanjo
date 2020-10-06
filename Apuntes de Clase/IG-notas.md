@@ -1,4 +1,3 @@
-# Ingeniería Gráfica  
 
 # Tema 1
 
@@ -10,7 +9,7 @@
     - Una img vect tiene lista de segmentos o curvas con una serie de parámetros numéricos.
 - __Interactive Grafic Program__ --> Visualiza una imagen que responde a eventos (acciones del usuario) --> Timepos de espera de ms
 - __Non-Interactive Grafic Program:__ Modelo --> Salidas: imágenes con duración s<-->horas  
-- __Proceso de visualización:__ Modelo de escena y parámetros
+- __Proceso de visualización:__ producir una imagen a partir del Modelo de escena y parámetros
     - Modelo Escena: ED
         - Modelo geométrico: primitivas, modelos de frontera, representacion de la forma de objetos con poligonales.
         - Modelo de aspecto: Parámetros que definen el aspecto de objetos.  
@@ -57,8 +56,8 @@ For each pixel q de la imagen a producir
         - Vértice: punto en el espacio 2D o 3D. Una o varias primitvas se representan con una lista de coordenadas de vértices, más alguna información adicional.
         - Framebuffer: zona de memoria en la GPU donde están los colores de los pixeles de la imagen que se está viendo en pantalla. 
     - Etapas de Calculo:
-        - Transformación y proyección de primitivas.
-            -Proyección: perspectiva o paralela
+        - Transformación y proyección de primitivas.  
+            - Proyección: perspectiva o paralela
 
 ### Las APIs de rasterización 
 La escritura en el Framebuffer es lenta y se realiza pixel a pixel, ya que cada operación de acceso al buffer es lenta. Usando una API conseguimos separar la implementación del hardware, permitiendo portabilidad y acceso simultáneio.  
@@ -99,26 +98,37 @@ Estructura de un programa:
   - Establecimiento de las funciones del programa que actuarán como gestoras de eventos
   - Configuración inicial de OpenGL
 - Función de viusalización de un frame o cuadro
-- Bucle principal
+- Bucle principal     
+<img src="ig1.jpg">   
 
 ### Tipos de primitivas
 - Primitiva: punto, segmento o polígono que generalmente son triángulos. 
 - Con una lista de n coordenadas se puede codificar:
   - puntos aislados
   - segmentos de recta
-  - triangulos
+  - triangulos 
   - cuadriláteros
   - polígono
   - tira de triángulos
   - abanico de triángulos
   - tira de cuadriláteros
-- Los polígonos se pueden visualizar como:
-  - Puntos
-  - Líneas
-  - Relleno  
-- Se debe cumlir:
-  - Vertices en el mismo plano
-  - No se deben intersecar las aristas
+- En OpenGL se definen varias constante de tipo __GLenum__ para identificar los distintos tipos de primitivas (puntos y segmento):
+  - GL_POINTS
+  - GL_LINES
+  - GL_LINE_STRIP (polilínea abierta)
+  - GL_LINE_LOOP  (polilínea cerrada)
+- Primitivas tipo polígono:
+
+<img src="ig2.jpg"> 
+<img src="ig3.jpg">  
+
+- Los polígonos se pueden visualizar como:  
+  - Puntos  
+  - Líneas (polilínea cerrada)
+  - Relleno 
+- Polígonos con más de tres vértices
+  - Deben tener todos sus vértices en el mismo plano 
+  - No se deben intersecar las aristas  
   - Deben ser convexos
 - Problema de vértices replicados: se repiten coordenadas
   - Solución: Secuencias indexadas
@@ -128,36 +138,40 @@ Estructura de un programa:
 __IMPORTANTE__: no confundir la constante __GL_Line__ con __GL_Lines__
 ### Atributos de vértices   
 - **Coordenadas de su posición**
-- **color**: RGB entre 0 y 1
-- **Normal**: vector qued etermina la orientación (para iluminacion)  
-- **Coordenadas de textura**
+- **color**: vector terna RGB entre 0 y 1, con posible valor de transparencia
+- **Normal**: vector que determina la orientación (para iluminacion), tres posiciones  
+- **Coordenadas de textura:** se usan imágenes en vez de colores 
 - **Valores:**
   - Todo vertice --> (posicion,color,normal,coord_textura)  
+- A **cada vértice** siempre se le asocia una tupla por cada atributo:
+  - Todo vértice tiene asociado una posición, un color, una normal y unas coordenadas de texturas que se usarán o no. 
 
 ### Modos de envío  
 Si queremos visualizar la secuencia de vertices o atributos:  
-- Modo inmediato
+- **Modo inmediato**
   - Una llamada por vértice y atributo:
     - Lento
     - Cordenadas y atributos vértice a vértice
   - Una llamada para varios vérties con todos sus atributos
   - No almacena coordenadas, por tanto, para visualizar más de una vez es necesario enviar las mismas coordenadas cad vez  
-- Modo diferido: 
+- **Modo diferido:**
   - Una única llamda, previamente trasladar las cosas de la RAM a la GPU
   - Reservar memoria en la GPU  
+  - Se indica que se deben primero leer la GPU en vez de la RAM
 
 ### Almacenamiento de vértices y atributos  
-- Array de estructuras (AOS):
+- **Array de estructuras (AOS):**
   - Array o vector  
   - Cada entrada tiene:
     - Coordenadas de sus vertices
     - Atributos
-- Estructura de Arrays (SOA):
+- **Estructura de Arrays (SOA):**
   - Estructura con punteros a arrays 
   - Los arrays contienen:
     - uno para coordenadas
-    - otros para los atributos  
+    - otros para los atributos tales como colores, normalex, texturas, etc
     - Echarle un ojo a lo de los descriptores de la tabla
+<img src="ig4.png" with="200" heigh="200">
 ------------------------------------------------- 
 - Vertex Array Objects:   
       - Estructura de datos    
@@ -168,10 +182,38 @@ Si queremos visualizar la secuencia de vertices o atributos:
   
 ### Envío de vértices y atributos  
 
+10-10-20
+### Visualización y parámetros
+- **glPolygonMode(GL_FRONT_AND_BACK, nuevo_modo)**: cambia el modo de visualización de polígonos.
+  - Por defecto, __GL_GILL__
+  - **nuevo_modo** es de tipo **GLenum**
+- ---
+- Para los errores, declaramos una macro  
+  - Si hay mucho código, se pone una en principio y otra al final
+    - Si da error al final, ponemos una en medo a ver que tal 
+
+- **glViewport:** De todos los pixeles de la ventana, en cuales vamos a dibujar (rasterizar)
+  - La función se llama en la __FGE_CambiaTamano__
+- Inicialmente, OpenGL usa una proyección paralela al eje Z.  
+- 
+
+## Sección 4: Programación básica del Cauce
+En la practicas esto no lo haremos 
+### Cauce Gráfico. Tipos. Shaders.  
+- **Transformación:** 
+- **Sombreado:**
+  - Shaders:
+      - Procesador de vértices (vertex shader)
+      - Procesador de fragmentos (pixeles) (fragment shader)  
+- **Tipos de cauce gŕafico:**  
+  - **Cauce de funcionalidad fija**
+    - shaders predefinidos en OpenGL
+  - **Cauce programable**
+    - Se programan los shaders; Se compilan y enlazan en tiempo de ejecución; más flexible y eficiente
+
+## Sección 5: Apéndice matemático  
 
 
-## Sección 4
-## Sección 5  
 
 # Tema2:  
 
@@ -179,4 +221,15 @@ Si queremos visualizar la secuencia de vertices o atributos:
 Una ED que contiene información sobre una maya de triángulos en 3d. 
 - contiene:
   - Tabla de vertices
-  - Tabla de triáungos
+  - Tabla de triáungos  
+
+# PRÁCTICAS
+## Práctica 1  
+- Crear ED derivados de maya indexada
+- Inicializar el constructor 
+- Implementar tres métodos de viisualización 
+- El código fuente está dado en Teoria --> copiarlos entendiendo
+- No tenemos el método de visualización de la maya --> Pensarlo 
+- En función del modo de envío actual, llamar a una de las funcioens del array de vérties
+- Pensar la topología y la geometría de la maya del tetraedro --> vértices, tuplas etc para construir la tabla de triángulos
+- 
