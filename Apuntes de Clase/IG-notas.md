@@ -1,4 +1,3 @@
-
 # Tema 1
 
 ## Sección 2: Proceso de visualización  
@@ -178,11 +177,64 @@ Si queremos visualizar la secuencia de vertices o atributos:
       - Para modo diferido:  
         - Crea tantos VAOs como sean necesarios  
       - Para modo inmediato:  
-        - guarda un único VAO  
+        - guarda un único VAO 
+### Datos sobre secuencias de vértices
+Para **visualizar** necesitamos conocer:
+- Localización en memoria y formato de la tabla de coordenadas
+- Para cada tabla de atriutos y para la tabla de índices
+  - Un booleano para saber si se usa o no la tabla
+    - si True =>localización en memoria y formato de la tabla  
+Si se envía en:
+- Modo inmediato: hacerlo para cada viusalización
+- Diferido: enviar una vez y reusar la información para visualizarlo muchas veces   
+
+### Vertex Array Objects (VAOs) de OpenGL
+ED que contiene información sobre una secuencia de vértices:
+- En el modo **inmediato**:
+  - se Guarda un único VAO
+  - Actualizar VAO antes de visualziar una nueva secuencia de vertices 
+- En el modo **diferido**:
+  - Hay tantos VAOs como sean necesarios
+  - Cada VAO tiene un entero único asocaido (nombre dle VAO)
+  - Por defecto está el VAO = 0
+La aplicación necesita únicamente el identificador del VAO (nombre_vao) y cada tabla referenciada en un VAO debe estar en la GPU
+
+FALTAN ALGUNAS COSILLAS 
   
 ### Envío de vértices y atributos  
 
-10-10-20
+Las coordenadas se pueden enviar de tres formas:
+- Llamada a **glVertex** 
+  - Una llamada por vértice
+  - Poner en mitad de **glBegin** y **glEnd**
+    - **glVertex3f** admite tres valores reales del tipo GLfloat
+    - En la llamada a **glBegin** se indica como parámetro que tupos de primitivas se queiren construir con la secuencia
+- Única llamada a:
+  - **glDrawArrays** (secuencias no indexadas)
+  - **glDrawElements** (secuencia indexada)
+    - Requiere almacenar las seucencias de coordenadas, atributos e índices en un array en la memoria RAM
+    - OpenGL recibe la dirección del array y lee todas las coordenadas
+
+<img src=ig5.png>    
+
+- Para enviar atributos usamos las funciones:  
+  - **glColor3f**
+  - **glNormal**
+  - **glTexCoord2f**  
+
+Para enviar vertices
+~~~C++
+std::vector<float> coords;
+...
+...
+glBegin( tipo_prim );
+for(int i = 0 ; i z coords.size()/3 ; i++)
+  glVertex3f (coords[3*i+0],coords[3*i+1],coords[3*i+2]);
+glEnd();
+~~~
+HAY MÁS VERTIENTES DE LA FAMILIA glVertex  
+
+
 ### Visualización y parámetros
 - **glPolygonMode(GL_FRONT_AND_BACK, nuevo_modo)**: cambia el modo de visualización de polígonos.
   - Por defecto, __GL_GILL__
@@ -213,9 +265,58 @@ En la practicas esto no lo haremos
 
 ## Sección 5: Apéndice matemático  
 
+- Transformaciones afín o transformaciones lineales:
+  - Transformacioens que conservan lineas rectas y conservan el paralelismo
+
 
 
 # Tema2:  
+
+### Modelos geométricos formales
+- __Modelo geométrico:__ modelo matemático para representar un objeto geométrico que existe en un espacio afín.
+  - Los más genrales son los subconjuntos de puntos, como una esfera
+- __Modelo basado n subconuntos de puntos:__
+  - Permite representar cualquier objeto
+  - No se puede representar en la memoria de un pc
+    - Como solución se usan: __Modelos geométricos computacionales:__
+      - __Ennumeración espacial:__ (voxels)
+      - __Modelos de fronteras:__  (caras)
+
+### Modelos de frontera  
+- __Mallas de polígonos:__ conjunto de puntos de un espacio afín que forman caras planas, usualmente adyacentes entre ellas y que aproxima la forntera de un objeto en el espacio 3D.  
+- __Objeto:__  Conjunto de puntos
+- __Cara:__ conjunto de puntos en un plano delimitados por un polígono
+- __Mallas:__ aproxima una superficie
+  - Encierra completamente una región del espacio, el objeto tiene volumen  __(mallas cerradas)__
+    - Pueden tener cualquier género topológico (el #huecos)
+  - Constituye en sí misma el objeto que tiene volumen nulo __(mallas abiertas)__
+    - Pueden tener huecos entre ellas  
+
+- __Elementos de las mallas:__ 
+  - __Vértices:__ par formado por un punto y un valor entero único
+    - Punto -> posición del vertices
+    - Entero -> Índice del vertice 
+      - permite expresar la topología de una malla 
+      - facilita construir representacioens computacionales de las mallas 
+      - Dos vértices con distinto índice pueden tener la misma posición
+  - __Caras:__ contiene conjunto de puntos coplanares que están delimitados por un único polígono plano. Se determinal por una seccuencia ordenada de índices de vérticces que forman dicho polígono 
+    - En la secuenci de índices, cad vertice comparte una arista con el siguiente
+    - Dos caras distitnas no pueden tneerr asocaido el mismo conjunto de indices, nni siquiera con distinto orden
+  - __Arista:__ conjunto de puntos que van desde un lado a otro
+    - los dos índices de vice de una arista no pueden coincidir
+    - El orden en el que aparecen los índices en el par es irrelevantes
+    - Dos aristas distintas no pueden tener el mismo par de índices   
+    - 
+- Una __Malla:__ viene determinada:
+  - Secuencia de posiciones de ssus n vérties
+  - Seccuencia de caras, cada una de ellas representada como una secuenci de k índices  de vértice
+- __Relaciones de adyacencia:__ s pueden expresar en términos de los índices de los vértices puesto que los vértices están numerados 
+- Una malla tiene una geometría y una topología  
+- __Características de las 2-variedades__
+  - Un vértice es adyacente a dos arsitas como mínimo
+  - Una arista siempre es adyacente a una o a dos caras
+  - Todas las caras adyacentes a un vértice se pued ordenar en una secuencia en la cual cada cara es adyacente a la sigueinte 
+-Se puede modificar una malla para que sea una 2-variedad
 
 ### Mayas indexadas  
 Una ED que contiene información sobre una maya de triángulos en 3d. 
