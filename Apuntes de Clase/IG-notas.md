@@ -1,5 +1,4 @@
-# Tema 1
-
+# Tema 1:
 ## Sección 2: Proceso de visualización  
 - Dos algoritmos para visualizar imágenes: rasterización y ray-tracing 
 - __Programa gráfico__ --> almacena ED con modelo --> Salida: imagen
@@ -318,11 +317,109 @@ En la practicas esto no lo haremos
   - Todas las caras adyacentes a un vértice se pued ordenar en una secuencia en la cual cada cara es adyacente a la sigueinte 
 -Se puede modificar una malla para que sea una 2-variedad
 
-### Mayas indexadas  
+__Orientación coherente de vértices en cada cara:__
+- Caras adyacentes--> enumeración de los vértices en el mismo sentido
+- Una malla cerrad--> cara vista desde el exterior rpesenta sus vértices en sentido anti-horarios
+- Malla cerrada:--> una cara se ve en cada sentido
+
+__ATRIBUTOS DE LA MALLA: NORMALES:__
+- Normales: vetores de longitud unidad:
+  - __normales de caras:__ vector unitario perpendicular a cada cara, apuntando al exterior de la malla si es una malla cerrada
+    - Útiles cuando el objeto que se modela con la malla está realmente compuesto de caras planas o cuando se quiere hacer sombreado plano o bien cuando se quiere hacer sombreado plano.
+    - Tienen sentido cuando la malla aproxima una superficcie crvada
+  - __normales de vertices:__ lo mismo pero con los vértices 
+  - __FPROBLEMA: DISCONTINUIDAD DE LA NORMAL__: Algunos objetas presentan aristas o vértices donde la normal es discontinua, en ese caso promediar normales es mala idea, y es necesario replicar cértices y arsitas 
+__ATRIBUTOS DE LA MALLA: Colores:__
+- Colores: Ternas RGB con valores entre 0 y 1
+  - __colores de caras:__
+  - __colores de vértices:__ color de la superficie en cada vértice
+- Hay más atributos
+
+### 3. Representación en memoria de modelos de fronteras
+- __FORMAS DE REPRESENTAR LAS MALLAS EN LA MEMORIA DE ORDENADOR:__
+  - __Triángulos aislados, tiras de tríangulos:__ no representan explícitamente la topología
+  - __Mallas indexadas:__ lo más común, representan explícitamente la topología.
+  - __Aristas aladas:__ extensión de las mallas indexadas para eficiencia en tiempo
+
+### 3.1 Triangulos aislados  
+- Lista o tabla de tríangulos aislados
+- Vector o lista con tres entradas (tiplo Tupla3f) para cada triangulo
+- Para cada triángulo se almacena als coordenadas locales de cada uno de sus tres vértices (9 valores flotante en total)
+- La tabla se puede almacenar en memoria con todas las coordenadas contiguas
+- En total, incluye 9n valores flotante
+- Representación poco eficiente en tiempo y memoria
+- No hay información explicita sobre la topología de la malla
+### 3.2 Tiras de triangulos
+- Pretende reducir la memoria y el tiempo que neceista la representación de triángulos aislados
+  - Se reduce el número de vees que aparece replicadas las coordenadas
+- Inconvenientes:
+    - No evita totalfmente las redundancias
+    - No incluye información explícita sobre la topología de la malla
+    - Representación compleja
+    - Necesidad de algoritmos
+- Una malla es una estructura con varias tira. La tira número __I__ ( con ni triangulos) es un arrai con ni + 2 celdas, en cada una están las coordenadas maestras de un vértice
+### 3.3 Mallas indexadas
 Una ED que contiene información sobre una maya de triángulos en 3d. 
-- contiene:
-  - Tabla de vertices
-  - Tabla de triáungos  
+
+- Tabla de vertices: Entrada por vértice
+- Tabla de triáungos: Ińdice del vértice
+Ventajas:
+  - No se repiten coordenadas de vértices:
+  - Hay información explícita de la topología
+   
+### 3.4 Representación con estructuras de aristas aladas  
+- El problema de las mallas indexadas es que la conulta de adyacencia puede ser costosa ==> Sol: aristas aladas  
+- Las aristas aladas son para mallas que encierran un volumen, es decir, siemrpe hay dos caras adyaccentes a una arista. 
+- Las consultas sobre adyacencia de arista-vertice y arista-triangulo pasan a tener un coste de O(1)
+- Una malla se puede codificar usando una tabla de vértices (tver) mas una tabla de aristas (tari).:
+  - Entrada por cada arista con dos índices:
+    - vi = índice de vértice inicial
+    - vf = índice de vértice final
+  - También tiene:
+    - ti = índice de triángulo a la izquierda
+    - td = indice de triángulo a la derecha
+- Con lo anterior permitimos consultas sobre adyaccenccia entre arista-vértice y arista-triángulo en tiempo O(1)
+- Una arista tiene aociados un chorro de índices 
+
+
+
+
+## Sección 4: Transformaciones geométricas
+
+### Concepto de transformación Geométrica
+- Marco de coordenadas de la escena o marco de coordenadas del mundo 
+- Las coordenadas de los vérties repecto de dicho sistema de referencia se llaman coordenadas del mundo
+- Esto permite separar la definición de los objetos, de su usu en una escena concreto.
+- __TRANSFORMACIONES GEOMÉTRICAS__
+  - Hay que calcular las coordeandas del mundo a pasrtir de las coordenadas locales o maestras
+    - Transformaciones afines 
+      - Rotaicones
+      - Traslaciones
+      - Escalado (uniforme y no unifirme)
+      - Cizallas
+###
+
+###
+
+### Transformaciones ne OoenGL con cle cauce fijo
+OpenGL almacena en el cauce fijo como parte del estado una matriz 4x4 que codifica una transformación geométrica y que se llama __modelview matrix__ la cual se ve como composición de dos matrices:
+  - __N__ matriz dde modelado: posiciona los puntos en su lugar en coordenadas del mundo
+  - __V:__ matriz de vista: posiciona los puntos en su lugar en coordenadas relativas a la cámara
+La matriz de model view se apica a todos los puntos generados con __glVertex__
+
+
+## Sección 5: Modelo jerárquico. Representación y visualización
+
+### Modelos jerárquicos y grafo de escena.  
+Una escena S es una serie de n objetos
+  - Cada objeto Oi se incluye con una transformación Ti
+  - Un objeto puede instanciarse más de una vez pero con distinta transformación
+  - Podemos ver la Matriz Ti como algo que sirve para convertir desde coordenadas relativas a Ri hacia coordenaas relativas del mundo W.
+Cada objeto Oi del esquema anterior puede ser de dos tipos de objetos geométricos:
+  - __Objeto simple:__ Oi es una malla u otro objeto que no está compuesto de otros objetos más simples
+  - __Objeto compuesto:__ Oi es una sub-escena, i.e., está compuesto de varios objetos que se instancian mediante diferentes transformaciones. 
+Escena -- Grafo Dirigido acíclico
+
 
 # PRÁCTICAS
 ## Práctica 1  
