@@ -1,3 +1,0 @@
-/home/kiedie/MEGAsync/UNIVERSIDAD/IG/Practicas/Proyecto/Trabajo/cmake-unix/build/CMakeFiles/rebuild_cache.dir
-/home/kiedie/MEGAsync/UNIVERSIDAD/IG/Practicas/Proyecto/Trabajo/cmake-unix/build/CMakeFiles/edit_cache.dir
-/home/kiedie/MEGAsync/UNIVERSIDAD/IG/Practicas/Proyecto/Trabajo/cmake-unix/build/CMakeFiles/pracs_ig_exe.dir
